@@ -75,6 +75,7 @@ class Missile:
         self.acceleration = Vector3()
         self.is_target = is_target
         self.destroyed = False
+        self.was_intercepted = False  # True if destroyed by interceptor, False if hit ground
         self.radius = 1.0  # For collision detection
         
     def update(self, dt: float, gravity: Vector3, wind_resistance: float = 0.01):
@@ -94,9 +95,12 @@ class Missile:
         self.position += self.velocity * dt
         
         # Ground collision (simplified)
-        if self.position.y < 0:
+        if self.position.y < 0 and not self.destroyed:
             self.position.y = 0
             self.destroyed = True
+            # Only set was_intercepted to False if it wasn't already intercepted
+            if not hasattr(self, 'was_intercepted'):
+                self.was_intercepted = False
 
 class Interceptor(Missile):
     def __init__(self, position: Vector3, velocity: Vector3, target_position: Vector3 = None, 
@@ -458,10 +462,12 @@ class MissileInterceptorSimulation:
         return distance < (interceptor.radius + target.radius)
     
     def on_collision(self, interceptor: 'Interceptor', target: 'Missile'):
-        self.interception_count += 1
-        print(f"Interceptor {self.interception_count} hit at time {self.time:.2f}s!")
-        target.destroyed = True
-        interceptor.destroyed = True
+        if not target.destroyed:  # Only count if target wasn't already destroyed
+            target.was_intercepted = True
+            target.destroyed = True
+            interceptor.destroyed = True
+            self.interception_count += 1
+            print(f"Interceptor hit target at time {self.time:.2f}s!")
         
         # End simulation if all interceptors are done
         if all(i.destroyed for i in self.interceptors):

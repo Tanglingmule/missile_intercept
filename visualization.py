@@ -382,17 +382,24 @@ def main():
         active_interceptors = sum(1 for i in sim.interceptors if not i.destroyed)
         total_interceptors_launched = len(sim.interceptors)
         
-        # Calculate success metrics
-        total_engagements = sim.interception_count + active_targets
-        success_rate = (sim.interception_count / total_engagements * 100) if total_engagements > 0 else 0.0
+        # Calculate interception statistics
+        total_targets = len(sim.targets)
+        intercepted_targets = sum(1 for t in sim.targets if hasattr(t, 'was_intercepted') and t.was_intercepted)
+        missed_targets = sum(1 for t in sim.targets if t.destroyed and not (hasattr(t, 'was_intercepted') and t.was_intercepted))
+        
+        # Calculate success rate based only on intercepted vs total targets
+        success_rate = (intercepted_targets / total_targets * 100) if total_targets > 0 else 0.0
+        
+        # Calculate interceptor efficiency (interceptors per successful interception)
+        interceptor_efficiency = (total_interceptors_launched / intercepted_targets) if intercepted_targets > 0 else 0.0
         
         status_text = [
             f"=== Simulation Status ===",
             f"Time: {sim.time:.1f}s | Status: {'PAUSED' if sim.time_scale == 0 else 'RUNNING'}",
-            f"Targets: {active_targets} remaining of {len(sim.targets)} total",
+            f"Targets: {intercepted_targets} intercepted, {missed_targets} missed of {total_targets}",
             f"Interceptors: {active_interceptors} active, {total_interceptors_launched} launched",
-            f"Interceptions: {sim.interception_count}",
-            f"Success Rate: {success_rate:.1f}%",
+            f"Interceptor Efficiency: {interceptor_efficiency:.1f} per hit",
+            f"Interception Rate: {success_rate:.1f}%",
             "",
             "=== Controls ===",
             "Left-click + Drag: Rotate view",
