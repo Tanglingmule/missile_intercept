@@ -290,10 +290,13 @@ def main():
                     target_trajectories[i].pop(0)
         
         # Update interceptor trajectories
+        # First, ensure we have enough trajectory lists for all interceptors
+        while len(interceptor_trajectory) < len(sim.interceptors):
+            interceptor_trajectory.append([])
+            
+        # Then update trajectories for each interceptor
         for i, interceptor in enumerate(sim.interceptors):
-            if not interceptor.destroyed:
-                if i >= len(interceptor_trajectory):
-                    interceptor_trajectory.append([])
+            if not interceptor.destroyed and i < len(interceptor_trajectory):
                 interceptor_trajectory[i].append(Vector3(interceptor.position.x, interceptor.position.y, interceptor.position.z))
                 if len(interceptor_trajectory[i]) > max_trajectory_points:
                     interceptor_trajectory[i].pop(0)
