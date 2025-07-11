@@ -420,6 +420,8 @@ def main():
         # Display FPS in window title
         fps = int(clock.get_fps())
         pygame.display.set_caption(f"Missile Intercept Simulation - FPS: {fps}")
+
+        print('Bullets shot: ', len(sim.interceptors))
     
     pygame.quit()
     sys.exit()

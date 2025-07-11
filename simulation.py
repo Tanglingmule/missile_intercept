@@ -104,7 +104,7 @@ class Missile:
 
 class Interceptor(Missile):
     def __init__(self, position: Vector3, velocity: Vector3, target_position: Vector3 = None, 
-                 target_velocity: Vector3 = None, accuracy: float = 1.0, speed_factor: float = 1.0):
+                 target_velocity: Vector3 = None, accuracy: float = 0.8, speed_factor: float = 1.0):
         super().__init__(position, velocity, is_target=False)
         self.target_position = target_position or Vector3(0, 0, 0)
         self.target_velocity = target_velocity or Vector3(0, 0, 0)
@@ -123,9 +123,9 @@ class CRAMSystem:
     def __init__(self, position: Vector3):
         self.position = position
         self.rotation = Vector3(0, 0, 0)  # pitch, yaw, roll
-        self.shot_interval = 0.2  # seconds between shots (faster for multiple targets)
+        self.shot_interval = 0.01  # seconds between shots (faster for multiple targets)
         self.last_shot_time = -10  # initialize to allow immediate first shot
-        self.max_interceptors = 100  # Increased for multiple targets
+        self.max_interceptors = 10000  # Increased for multiple targets
         self.active_interceptors = 0
         self.engagement_range = 1000  # Increased engagement range
         self.target_history = {}  # Track targets being engaged
@@ -286,7 +286,7 @@ class MissileInterceptorSimulation:
     
     def create_interceptors(self):
         import random
-        num_interceptors = 50
+        num_interceptors = 2550
         
         for i in range(num_interceptors):
             # Start interceptors in a more strategic spread pattern
